@@ -1,5 +1,6 @@
-const Table = ({ name, data }) => {
+import { NavLink } from "react-router-dom";
 
+const Table = ({ name, data, action }) => {
   return (
     <div className="card shadow mb-4">
       <div className="card-header py-3">
@@ -16,18 +17,29 @@ const Table = ({ name, data }) => {
             <thead>
               <tr>
                 {Object.keys(data[0]).map((key) => (
-                  <th key={key}>{key}</th>
+                  <>
+                    <th key={key}>{key}</th>
+                  </>
                 ))}
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {data.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-100">
+                <tr key={index}>
                   {Object.values(row).map((value, i) => (
-                    <td key={i} className="border border-gray-300 px-4 py-2">
-                      {value}
-                    </td>
+                    <>
+                      <td key={i}>{value}</td>
+                    </>
                   ))}
+                  <td>
+                    <NavLink
+                      to={`${action}/${index}`}
+                      className="btn btn-primary"
+                    >
+                      Voir la classe {index}{" "}
+                    </NavLink>
+                  </td>
                 </tr>
               ))}
             </tbody>

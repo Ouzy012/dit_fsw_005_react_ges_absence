@@ -1,35 +1,60 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import InputField from "../../component/ui/form/InputField";
 import { useState } from "react";
+import { login } from "../../services/AuthService";
+import axios from "axios";
+import { apiUrl } from "../../utils/constant";
+import { setSession } from "../../utils/session";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [erreur, setErreur] = useState({});
 
   const required = (formData, name) => {
-    if (!formData.get(name)) {
-      return `Le champs ${name} est obligatoire`;
-    }
+    const value = formData.get(name);
+    return value ? null : `Le champ ${name} est obligatoire`;
   };
   const validateInput = (formData) => {
     let errors = {};
 
-    errors.email = required(formData, "email");
-    errors.password = required(formData, "password");
+    ["email", "password"].forEach((field) => {
+      const error = required(formData, field);
+      if (error) errors[field] = error;
+    });
 
     return errors;
   };
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    formData.get("category");
     const all_errors = validateInput(formData);
 
     if (Object.keys(all_errors).length > 0) {
       setErreur(all_errors);
       return;
+    } else {
+      setLoading(true);
+
+      await axios
+        .post(`${apiUrl}/login`, formData)
+        .then((response) => {
+          const user = response.data.user;
+          const token = response.data.access_token;
+          setSession(user, token);
+          navigate("/home");
+        })
+        .catch((err) => {
+          setError(err.response.data.message);
+          setTimeout(() => {
+            setError('')
+          }, 3000);
+          setLoading(false);
+        });
     }
   }
 
@@ -45,7 +70,8 @@ const Login = () => {
                   <h1 className="h4 text-gray-900 mb-4">Connexion!</h1>
                 </div>
                 <form className="user" onSubmit={handleSubmit}>
-                  <div class="form-group">
+                  <span className="text-danger"> {error} </span>
+                  <div className="form-group">
                     <InputField
                       name="email"
                       type="email"
@@ -53,17 +79,26 @@ const Login = () => {
                       errors={erreur}
                     />
                   </div>
-                  <div class="form-group">
+                  <div className="form-group">
                     <InputField
                       name="password"
-                      type="passord"
+                      type="password"
                       placeholder="Votre mot de passe"
                       errors={erreur}
                     />
                   </div>
-                  <button className="btn btn-primary btn-user btn-block">
-                    Se connecter
-                  </button>
+                  {loading ? (
+                    <button
+                      className="btn btn-primary btn-user btn-block"
+                      disabled
+                    >
+                      En cours de chargement
+                    </button>
+                  ) : (
+                    <button className="btn btn-primary btn-user btn-block">
+                      Se connecter
+                    </button>
+                  )}
                 </form>
                 <hr />
                 <div className="text-center">

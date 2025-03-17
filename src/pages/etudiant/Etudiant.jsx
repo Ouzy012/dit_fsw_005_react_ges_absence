@@ -2,7 +2,8 @@ import { useParams } from "react-router-dom";
 import Table from "../../component/ui/table/Table";
 
 const Etudiant = () => {
-  const { idClasse } = useParams();
+  const { idClasse } = useParams();  
+
   const etudiants = [
     {
       matricule: "DIT-28762",

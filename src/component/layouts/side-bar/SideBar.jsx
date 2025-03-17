@@ -1,6 +1,8 @@
-import { a, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { getSession } from "../../../utils/session";
 
 const SideBar = () => {
+  
   return (
     <ul
       className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
@@ -21,12 +23,23 @@ const SideBar = () => {
       <hr className="sidebar-divider my-0" />
 
       {/* <!-- Nav Item - Charts --> */}
-      <li className="nav-item">
-        <NavLink className="nav-link" to="/">
-          <i className="fas fa-fw fa-chart-area"></i>
-          <span>Mes classes</span>
-        </NavLink>
-      </li>
+      {getSession().user.profils === "ENSEIGNANT" ? (
+        <>
+          <li className="nav-item">
+            <NavLink className="nav-link" to="/home">
+              <i className="fas fa-fw fa-chart-area"></i>
+              <span>Mes classes</span>
+            </NavLink>
+          </li>
+        </>
+      ) : (
+        <li className="nav-item">
+          <NavLink className="nav-link" to="/">
+            <i className="fas fa-fw fa-chart-area"></i>
+            <span>Mes Absences</span>
+          </NavLink>
+        </li>
+      )}
 
       {/* <!-- Divider --> */}
       <hr className="sidebar-divider d-none d-md-block" />
